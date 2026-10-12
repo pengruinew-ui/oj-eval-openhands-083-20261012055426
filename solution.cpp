@@ -4,23 +4,22 @@ using namespace std;
 struct Node {
     int data;
     Node* next;
-    Node(int val) : data(val), next(nullptr) {}
 };
 
 int main() {
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
-    
     int n, m;
     cin >> n >> m;
     
     // Create circular linked list manually
-    Node* head = new Node(1);
+    Node* head = new Node();
+    head->data = 1;
     Node* current = head;
     
     for (int i = 2; i <= n; i++) {
-        current->next = new Node(i);
-        current = current->next;
+        Node* newNode = new Node();
+        newNode->data = i;
+        current->next = newNode;
+        current = newNode;
     }
     
     // Make it circular
@@ -33,14 +32,14 @@ int main() {
     while (remaining > 0) {
         if (remaining == 1) {
             // Last node
-            cout << current->data << '\n';
+            cout << current->data << endl;
             delete current;
             break;
         }
         
         if (m == 1) {
             // Delete current node
-            cout << current->data << '\n';
+            cout << current->data << endl;
             
             // Find the previous node
             Node* prev = current;
@@ -64,7 +63,7 @@ int main() {
             
             // The node to delete is prev->next
             Node* toDelete = prev->next;
-            cout << toDelete->data << '\n';
+            cout << toDelete->data << endl;
             
             // Remove the node
             prev->next = toDelete->next;
