@@ -9,55 +9,49 @@ struct Node {
     Node(int val) : data(val), next(nullptr) {}
 };
 
-class CircularLinkedList {
-private:
-    Node* head;
-    Node* tail;
-    int size;
+int main() {
+    int n, m;
+    cin >> n >> m;
     
-public:
-    CircularLinkedList() : head(nullptr), tail(nullptr), size(0) {}
+    // Create circular linked list with nodes 1 to n
+    Node* head = nullptr;
+    Node* tail = nullptr;
     
-    // Insert node at the end of the list
-    void insert(int value) {
-        Node* newNode = new Node(value);
+    // Build the circular linked list
+    for (int i = 1; i <= n; i++) {
+        Node* newNode = new Node(i);
         
         if (head == nullptr) {
-            // First node - points to itself
+            // First node
             head = newNode;
             tail = newNode;
-            newNode->next = newNode;
+            newNode->next = newNode; // Points to itself
         } else {
-            // Insert at end and maintain circular property
+            // Add to end
             tail->next = newNode;
             newNode->next = head;
             tail = newNode;
         }
-        size++;
     }
     
-    // Remove the m-th node starting from current position
-    // Returns the value of the removed node
-    int removeMthNode(int m, Node*& current) {
-        if (size == 0) return -1;
-        
-        if (size == 1) {
-            // Last node - delete it directly
-            int deletedValue = head->data;
-            delete head;
-            head = nullptr;
-            tail = nullptr;
-            current = nullptr;
-            size = 0;
-            return deletedValue;
+    Node* current = head;
+    int remaining = n;
+    
+    // Josephus elimination process
+    while (remaining > 0) {
+        if (remaining == 1) {
+            // Last node - output and delete
+            cout << current->data << endl;
+            delete current;
+            break;
         }
         
         if (m == 1) {
             // Special case: delete current node
             Node* toDelete = current;
-            int deletedValue = toDelete->data;
+            cout << toDelete->data << endl;
             
-            // Find the node before current (tail)
+            // Find the previous node (tail)
             Node* prev = tail;
             prev->next = current->next;
             
@@ -71,78 +65,34 @@ public:
             
             current = current->next;
             delete toDelete;
-            size--;
-            return deletedValue;
+            remaining--;
+        } else {
+            // Find the node before the one to delete
+            Node* prev = current;
+            for (int i = 1; i < m - 1; i++) {
+                prev = prev->next;
+            }
+            
+            // Node to delete
+            Node* toDelete = prev->next;
+            cout << toDelete->data << endl;
+            
+            // Remove the node
+            prev->next = toDelete->next;
+            
+            // Update head or tail if necessary
+            if (toDelete == head) {
+                head = toDelete->next;
+            }
+            if (toDelete == tail) {
+                tail = prev;
+            }
+            
+            // Next counting starts from the node after the deleted one
+            current = toDelete->next;
+            delete toDelete;
+            remaining--;
         }
-        
-        // Move to the node before the one to be deleted
-        for (int i = 1; i < m - 1; i++) {
-            current = current->next;
-        }
-        
-        // Node to delete is current->next
-        Node* toDelete = current->next;
-        int deletedValue = toDelete->data;
-        
-        // Update links
-        current->next = toDelete->next;
-        
-        // Update head or tail if necessary
-        if (toDelete == head) {
-            head = toDelete->next;
-        }
-        if (toDelete == tail) {
-            tail = current;
-        }
-        
-        delete toDelete;
-        size--;
-        
-        // Move to next node for counting
-        current = current->next;
-        
-        return deletedValue;
-    }
-    
-    // Get current size
-    int getSize() const { return size; }
-    
-    // Get head pointer
-    Node* getHead() const { return head; }
-    
-    // Destructor to clean up memory
-    ~CircularLinkedList() {
-        if (head == nullptr) return;
-        
-        Node* current = head;
-        Node* nextNode;
-        
-        // Delete all nodes
-        for (int i = 0; i < size; i++) {
-            nextNode = current->next;
-            delete current;
-            current = nextNode;
-        }
-    }
-};
-
-int main() {
-    int n, m;
-    cin >> n >> m;
-    
-    // Create circular linked list with nodes 1 to n
-    CircularLinkedList list;
-    for (int i = 1; i <= n; i++) {
-        list.insert(i);
-    }
-    
-    // Start from node 1
-    Node* current = list.getHead();
-    
-    // Remove nodes one by one
-    while (list.getSize() > 0) {
-        int removedValue = list.removeMthNode(m, current);
-        cout << removedValue << endl;
     }
     
     return 0;
