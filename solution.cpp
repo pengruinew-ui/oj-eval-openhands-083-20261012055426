@@ -41,6 +41,17 @@ public:
     int removeMthNode(int m, Node*& current) {
         if (size == 0) return -1;
         
+        if (size == 1) {
+            // Last node - delete it directly
+            int deletedValue = head->data;
+            delete head;
+            head = nullptr;
+            tail = nullptr;
+            current = nullptr;
+            size = 0;
+            return deletedValue;
+        }
+        
         // Move to the node before the one to be deleted
         for (int i = 1; i < m - 1; i++) {
             current = current->next;
@@ -50,32 +61,22 @@ public:
         Node* toDelete = current->next;
         int deletedValue = toDelete->data;
         
-        // Remove the node
-        if (size == 1) {
-            // Last node
-            head = nullptr;
-            tail = nullptr;
-            current = nullptr;
-        } else {
-            // Update links
-            current->next = toDelete->next;
-            
-            // Update head or tail if necessary
-            if (toDelete == head) {
-                head = toDelete->next;
-            }
-            if (toDelete == tail) {
-                tail = current;
-            }
+        // Update links
+        current->next = toDelete->next;
+        
+        // Update head or tail if necessary
+        if (toDelete == head) {
+            head = toDelete->next;
+        }
+        if (toDelete == tail) {
+            tail = current;
         }
         
         delete toDelete;
         size--;
         
         // Move to next node for counting
-        if (current != nullptr) {
-            current = current->next;
-        }
+        current = current->next;
         
         return deletedValue;
     }
