@@ -52,6 +52,29 @@ public:
             return deletedValue;
         }
         
+        if (m == 1) {
+            // Special case: delete current node
+            Node* toDelete = current;
+            int deletedValue = toDelete->data;
+            
+            // Find the node before current (tail)
+            Node* prev = tail;
+            prev->next = current->next;
+            
+            // Update head or tail if necessary
+            if (toDelete == head) {
+                head = toDelete->next;
+            }
+            if (toDelete == tail) {
+                tail = prev;
+            }
+            
+            current = current->next;
+            delete toDelete;
+            size--;
+            return deletedValue;
+        }
+        
         // Move to the node before the one to be deleted
         for (int i = 1; i < m - 1; i++) {
             current = current->next;
