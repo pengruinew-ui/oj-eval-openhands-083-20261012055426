@@ -15,83 +15,81 @@ int main() {
     
     // Create circular linked list with nodes 1 to n
     Node* head = nullptr;
-    Node* tail = nullptr;
+    Node* prev = nullptr;
     
     // Build the circular linked list
     for (int i = 1; i <= n; i++) {
         Node* newNode = new Node(i);
         
         if (head == nullptr) {
-            // First node
             head = newNode;
-            tail = newNode;
-            newNode->next = newNode; // Points to itself
         } else {
-            // Add to end
-            tail->next = newNode;
-            newNode->next = head;
-            tail = newNode;
+            prev->next = newNode;
         }
+        prev = newNode;
+    }
+    
+    // Make it circular
+    if (prev != nullptr) {
+        prev->next = head;
     }
     
     Node* current = head;
-    int remaining = n;
     
     // Josephus elimination process
-    while (remaining > 0) {
-        if (remaining == 1) {
-            // Last node - output and delete
+    while (n > 0) {
+        if (n == 1) {
+            // Last node
             cout << current->data << endl;
             delete current;
             break;
         }
         
         if (m == 1) {
-            // Special case: delete current node
-            Node* toDelete = current;
-            cout << toDelete->data << endl;
+            // Delete current node
+            cout << current->data << endl;
             
-            // Find the previous node (tail)
-            Node* prev = tail;
-            prev->next = current->next;
-            
-            // Update head or tail if necessary
-            if (toDelete == head) {
-                head = toDelete->next;
-            }
-            if (toDelete == tail) {
-                tail = prev;
-            }
-            
-            current = current->next;
-            delete toDelete;
-            remaining--;
-        } else {
-            // Find the node before the one to delete
+            // Find the previous node (need to traverse)
             Node* prev = current;
-            for (int i = 1; i < m - 1; i++) {
+            while (prev->next != current) {
                 prev = prev->next;
             }
             
-            // Node to delete
-            Node* toDelete = prev->next;
+            // Remove current node
+            prev->next = current->next;
+            Node* nextNode = current->next;
+            
+            // Update head if necessary
+            if (current == head) {
+                head = nextNode;
+            }
+            
+            delete current;
+            current = nextNode;
+            n--;
+        } else {
+            // Find the (m-1)th node from current
+            for (int i = 1; i < m - 1; i++) {
+                current = current->next;
+            }
+            
+            // The node to delete is current->next
+            Node* toDelete = current->next;
             cout << toDelete->data << endl;
             
             // Remove the node
-            prev->next = toDelete->next;
+            current->next = toDelete->next;
             
-            // Update head or tail if necessary
+            // Update head if necessary
             if (toDelete == head) {
                 head = toDelete->next;
-            }
-            if (toDelete == tail) {
-                tail = prev;
             }
             
             // Next counting starts from the node after the deleted one
             current = toDelete->next;
+            
             delete toDelete;
-            remaining--;
+            n--;
         }
     }
     
